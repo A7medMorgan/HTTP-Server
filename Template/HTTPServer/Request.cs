@@ -75,6 +75,18 @@ namespace HTTPServer
             else return false;
         }
 
+        public bool Multiple_Connection_Over_time()
+        {
+            if (headerLines.Count != 0)
+            {
+                string conn;
+                headerLines.TryGetValue("Connection", out conn);
+                if (conn.Equals("Keep-alive"))
+                    return true;
+            }
+            return false;
+        }
+
         private bool ParseRequestLine()
         {
             string[] RequestLine = requestLines[0].Split(new string[] { " " }, StringSplitOptions.None);
@@ -126,7 +138,7 @@ namespace HTTPServer
             // skip the request line
             for (int line = 1; line < requestLines.Length; line++)
             {
-                string[] header = requestLines[line].Split(new string[] { ": " }, StringSplitOptions.None);
+                string[] header = requestLines[line].Split(new string[] { Configuration.Header_delimter }, StringSplitOptions.None);
 
                 if (header.Length == 2)
                 {

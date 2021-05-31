@@ -53,6 +53,10 @@ namespace HTTPServer
 
             responseString += content; // Add content
         }
+        public Response()
+        {
+            
+        }
 
         private string GetStatusLine(StatusCode code)
         {
@@ -82,6 +86,136 @@ namespace HTTPServer
             }
 
             return statusLine;
+        }
+        public Response CreateRespond(Request request , int server_id)
+        {
+            string Physical_path = string.Empty;
+            string content;
+            StatusCode statusCode;
+            try
+            {
+                //TODO: check for bad request 
+                if (!request.ParseRequest(server_id)) // parsing not successed
+                {
+                    statusCode = StatusCode.BadRequest;
+                    Physical_path = Configuration.ReletivePath + Configuration.BadRequestDefaultPageName;
+
+                    //TODO: read the physical file
+                    content = this.LoadDefaultPage(Physical_path);
+                    // Create OK response
+                    return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty);
+                }
+
+                switch (request.method)
+                {
+                    case RequestMethod.GET:
+                        return Create_Get_Request(request, server_id);
+                    case RequestMethod.POST:
+                        break;
+                    case RequestMethod.HEAD:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO: log exception using Logger class
+                Logger.LogException(ex, this.GetType().ToString());
+
+                // TODO: in case of exception, return Internal Server Error. 
+                statusCode = StatusCode.InternalServerError;
+                Physical_path = Configuration.ReletivePath + Configuration.InternalErrorDefaultPageName;
+                //TODO: read the physical file
+                content = this.LoadDefaultPage(Physical_path);
+                // Create OK response
+                return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty);
+            }
+            return null;
+        }
+
+        private Response Create_Get_Request(Request request, int server_id)
+        {
+            string content = string.Empty;
+            string Redirection_path = string.Empty;
+            string Physical_path = string.Empty;
+            StatusCode statusCode;
+                 // request has all the info need by server
+                
+                    //TODO: map the relativeURI in request to get the physical path of the resource.
+                    Physical_path = this.MAP_URI_ToPage_PhysicalPath(request.relativeURI);
+
+            //TODO: check file exists
+
+            if (!Physical_path.Equals(string.Empty))
+            {
+                statusCode = StatusCode.OK;
+            }
+            else
+            {
+                //TODO: check for redirect
+                Redirection_path = GetRedirectionPagePathIFExist(request.relativeURI);
+
+                if (Redirection_path.Equals(string.Empty)) // no redirection enteries
+                {
+                    Physical_path = Configuration.ReletivePath + Configuration.NotFoundDefaultPageName;
+                    statusCode = StatusCode.NotFound;
+                }
+                else
+                {
+                    Physical_path = Configuration.ReletivePath + Configuration.RedirectionDefaultPageName;
+                    statusCode = StatusCode.Redirect;
+                }
+            }
+            //TODO: read the physical file
+            content = this.LoadDefaultPage(Physical_path);
+            // Create OK response
+            return new Response(statusCode, Configuration.WebPagesTextType, content, Redirection_path);
+        }
+
+
+        private string MAP_URI_ToPage_PhysicalPath(string ReletiveURI)
+        {
+            string filepath = string.Empty;
+
+            if (ReletiveURI.Equals(string.Empty)) return filepath;
+
+            string[] splited = ReletiveURI.Split(Configuration.URI_delemiter, StringSplitOptions.RemoveEmptyEntries);
+
+            string page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
+
+            if (Configuration.Pages_path != null)
+                Configuration.Pages_path.TryGetValue(page_name, out filepath);
+
+            return filepath;
+        }
+
+        public string GetRedirectionPagePathIFExist(string relativePath)
+        {
+            // using Configuration.RedirectionRules return the redirected page path if exists else returns empty
+            string redirectied_path = string.Empty;
+            if (Configuration.RedirectionRules != null)
+                Configuration.RedirectionRules.TryGetValue(relativePath, out redirectied_path);
+
+            return redirectied_path;
+        }
+
+
+        public string LoadDefaultPage(string defaultPageName)
+        {
+            //string filePath = Path.Combine(Configuration.RootPath, defaultPageName); // From any Physical File at the Drive
+            //string filePath = Path.Combine(Configuration.ReletivePath, defaultPageName); // Debug Mode
+
+            // TODO: check if filepath not exist log exception using Logger class and return empty string
+            if (File.Exists(defaultPageName))
+                return File.ReadAllText(defaultPageName);
+
+            // else read file and return its content
+            else
+            {
+                Logger.LogException(new FileNotFoundException(), this.GetType().ToString());
+                return string.Empty;
+            }
         }
     }
 }

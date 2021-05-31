@@ -22,13 +22,13 @@ namespace HTTPServer
     class Request
     {
         string[] requestLines;
-        RequestMethod method;
+        public RequestMethod method { get; private set; }
         public string relativeURI;
         public Dictionary<string, string> headerLines {  get ;private set; }
 
 
 
-        HTTPVersion httpVersion;
+        public HTTPVersion httpVersion { get; private set; }
         string requestString;
         string[] contentLines;
 

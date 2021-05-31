@@ -24,7 +24,7 @@ namespace HTTPServer
 
             // Get Web Pages name of the specified Physical Path
             Configuration.Pages_path = new Dictionary<string, string>();
-            this.GetPages_path(Configuration.ReletivePath ,Configuration.S_WebPagesExtention,Configuration.Pages_path);
+            Configuration.GetPages_path(Configuration.ReletivePath ,Configuration.S_WebPagesExtention,Configuration.Pages_path);
 
             //TODO: initialize this.serverSocket
             EndPoint endpoint = null;
@@ -134,69 +134,12 @@ namespace HTTPServer
 
         Response HandleRequest(Request request)
         {
-            string content = string.Empty;
-            string Redirection_path = string.Empty;
-            string RelativePath = string.Empty;
-            string Physical_path = Configuration.InternalErrorDefaultPageName;
-            StatusCode statusCode = StatusCode.OK;
-            try
-            {
-                //TODO: check for bad request 
-                if (request.ParseRequest(server_ID))
-                {
-                    statusCode = StatusCode.BadRequest;
-                }
-                //TODO: map the relativeURI in request to get the physical path of the resource.
-                //GetFiles();
-                //TODO: check for redirect
-                Redirection_path = GetRedirectionPagePathIFExist(RelativePath);
-                //TODO: check file exists
+            Response response = new Response();
 
-                //TODO: read the physical file
-                content = File.ReadAllText(Physical_path);
-                // Create OK response
-
-                Response re = new Response(statusCode, Configuration.WebPagesTextType, content, Redirection_path);
-            }
-            catch (Exception ex)
-            {
-                // TODO: log exception using Logger class
-                Logger.LogException(ex, this.GetType().ToString());
-                // TODO: in case of exception, return Internal Server Error. 
-            }
-            return null;
+            return response.CreateRespond(request,server_ID);
         }
 
-        private string GetRedirectionPagePathIFExist(string relativePath)
-        {
-            // using Configuration.RedirectionRules return the redirected page path if exists else returns empty
-            string redirectied_path = string.Empty;
-            Configuration.RedirectionRules.TryGetValue(relativePath, out redirectied_path);
-
-            return redirectied_path;
-        }
-        private void GetPages_path(string path , string Type , Dictionary<string, string> Holder)
-        {
-            DirectoryInfo dir = new DirectoryInfo(@path);
-            FileInfo[] files = dir.GetFiles('*'+Type, SearchOption.AllDirectories);
-
-            foreach (FileInfo name in files)
-            {
-                // add only the name without the Extention and (in lower case) just for now
-                Holder.Add(name.Name.Substring(0,name.Name.Length - Type.Length).ToLower() , name.FullName); // key Name : value Full path
-            }
-        }
-
-        private string LoadDefaultPage(string defaultPageName)
-        {
-            //string filePath = Path.Combine(Configuration.RootPath, defaultPageName); // From any Physical File at the Drive
-            string filePath = Path.Combine(Configuration.ReletivePath, defaultPageName); // Debug Mode
-            
-            // TODO: check if filepath not exist log exception using Logger class and return empty string
-
-            // else read file and return its content
-            return string.Empty;
-        }
+        
 
         private void LoadRedirectionRules(string filePath)
         {

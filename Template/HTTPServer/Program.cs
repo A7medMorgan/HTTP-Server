@@ -13,7 +13,7 @@ namespace HTTPServer
         {
             // TODO: Call CreateRedirectionRulesFile() function to create the rules of redirection
                 CreateRedirectionRulesFile();
-           
+            File.Delete(Configuration.Log_file_path); // clear the log file
             //Start server
             // 1) Make server object on port 1000
             Console.WriteLine("Init Server ...");
@@ -33,16 +33,21 @@ namespace HTTPServer
             // means that when making request to aboustus.html,, it redirects me to aboutus2
 
             string Rules = string.Empty;
+
+            Console.WriteLine("Modify Rule in Redirection.txt File press (Y) to Cansel Press (N)");
+            char c = Console.ReadLine()[0];
+            if (c != 'y') return;
+
+            Console.WriteLine("Enter Rule as \"example1,example2\" just THE NAME and press Enter \n" +
+                              "To End Enter \"Null\"");
+            int i = 0;
             while (true)
             {
-                Console.WriteLine("Add Rule to Redirection.txt File press (Y) to Cansel Press (N)");
-                char c = Console.ReadLine()[0];
-                if (c != 'y') break;
+                Console.Write("Rule Number {0} :->  ", ++i);
+                string temp = Console.ReadLine();
+                if (temp.Equals("null")) break;
 
-                Console.WriteLine("Enter Rule as example1.html,example2.html");
-
-                Rules += Console.ReadLine() + "\n";
-                
+                Rules += temp + "\n";
             }
             if (Rules != string.Empty)
             {

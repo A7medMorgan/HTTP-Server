@@ -32,7 +32,7 @@ namespace HTTPServer
         {
             // TODO: Add headlines (Content-Type, Content-Length,Date, [location if there is redirection])
 
-            headerLines.Add("Content-Type" + Configuration.Header_delimter + "text/html");
+            headerLines.Add("Content-Type" + Configuration.Header_delimter + contentType);
             headerLines.Add("Date" + Configuration.Header_delimter + Logger.Get_Date());
             headerLines.Add("Content-Length" + Configuration.Header_delimter + content.Length.ToString());
 
@@ -62,22 +62,22 @@ namespace HTTPServer
             switch (code)
             {
                 case StatusCode.OK:
-                    statusLine = StatusCode.OK.ToString() + " OK";
+                    statusLine = StatusCode.OK.ToString() + " " + StatusCode.OK.ToString();
                     break;
                 case StatusCode.InternalServerError:
-                    statusLine = StatusCode.InternalServerError.ToString() + " InternalServerError";
+                    statusLine = StatusCode.InternalServerError + " " + StatusCode.InternalServerError.ToString();
                     break;
                 case StatusCode.NotFound:
-                    statusLine = StatusCode.NotFound.ToString() + " NotFound";
+                    statusLine = StatusCode.NotFound + " " + StatusCode.NotFound.ToString();
                     break;
                 case StatusCode.BadRequest:
-                    statusLine = StatusCode.BadRequest.ToString() + " BadRequest";
+                    statusLine = StatusCode.BadRequest + " " + StatusCode.BadRequest.ToString();
                     break;
                 case StatusCode.Redirect:
-                    statusLine = StatusCode.Redirect.ToString() + " Redirect";
+                    statusLine = StatusCode.Redirect + " " + StatusCode.Redirect.ToString();
                     break;
                 default:
-                    statusLine = StatusCode.BadRequest.ToString() + " BadRequest";
+                    statusLine = StatusCode.BadRequest + " " + StatusCode.BadRequest.ToString();
                     break;
             }
 

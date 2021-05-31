@@ -147,7 +147,6 @@ namespace HTTPServer
             }
             if (headerLines.Count < min_lines) return false; 
             return true;
-            //throw new NotImplementedException();
         }
 
         private bool ValidateBlankLine()
@@ -176,7 +175,6 @@ namespace HTTPServer
             }
 
             return blank_line;
-            //throw new NotImplementedException();
         }
 
     }

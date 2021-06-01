@@ -1,2 +1,5 @@
-Server Start With ID 0 binded on EndPoint 192.168.137.1:1000 
-Date : 5/31/2021 9:56:00 AM
+6/1/2021 5:01:00 AM
+Source :System
+An established connection was aborted by the software in your host machine
+Fun Caused EX :	Int32 Receive(Byte[], Int32, Int32, System.Net.Sockets.SocketFlags)
+SourceClass :-> HTTPServer.Server

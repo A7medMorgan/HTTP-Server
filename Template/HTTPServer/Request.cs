@@ -75,13 +75,13 @@ namespace HTTPServer
             else return false;
         }
 
-        public bool Multiple_Connection_Over_time()
+        public bool Multiple_Connection_Over_time() // presestance Connection
         {
             if (headerLines.Count != 0)
             {
                 string conn;
                 headerLines.TryGetValue("Connection", out conn);
-                if (conn.Equals("Keep-alive"))
+                if (conn.Equals("keep-alive"))
                     return true;
             }
             return false;

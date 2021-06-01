@@ -92,28 +92,31 @@ namespace HTTPServer
                     msg = Encoding.ASCII.GetString(data, 0, receivedLen);
                     if (receivedLen == 0)
                     {
-                        Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
-                        break;
+                        //Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
+                        //break;
+                        continue;
                     }
                     else
                         Console.WriteLine("Recieved request from :{0}", newConnection.RemoteEndPoint);
 
-                    Console.WriteLine("\tRecived \n{0} Byte", msg.Length);
+                    Console.WriteLine("\tRecived \n{0} Byte", msg);
                     // TODO: Create a Request object using received request string                    
                     Request request = new Request(msg);
+
+                    // TODO: Call HandleRequest Method that returns the response
+                    Response response = HandleRequest(request);
 
                     // Check to see if the client want the connection to stay open
                     if (request.Multiple_Connection_Over_time()) Multiple_Connection_Over_time = true;
                     else Multiple_Connection_Over_time = false;
-
-                    // TODO: Call HandleRequest Method that returns the response
-                    Response response = HandleRequest(request);
 
                     // TODO: Send Response back to client
 
                     data = Encoding.ASCII.GetBytes(response.ResponseString);
                     newConnection.Send(data,SocketFlags.None);
                     Console.WriteLine("Sent \n{0} Byte", data.Length);
+
+                    Console.WriteLine("Sent \n{0}", response.ResponseString);
 
                     msg = string.Empty; // clear the msg
                     if (!Multiple_Connection_Over_time) break; // end the connection
@@ -127,7 +130,7 @@ namespace HTTPServer
             }
 
             // TODO: close client socket
-            Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
+           // Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
             newConnection.Shutdown(SocketShutdown.Both);
             newConnection.Close();
         }
@@ -136,7 +139,9 @@ namespace HTTPServer
         {
             Response response = new Response();
 
-            return response.CreateRespond(request,server_ID);
+            bool parse_request = request.ParseRequest(server_ID);
+
+            return response.CreateRespond(parse_request,request.method,request.relativeURI,server_ID);
         }
 
         
@@ -159,7 +164,7 @@ namespace HTTPServer
                     foreach (string line in lines)
                     {
                         string[] rule = line.Split(Configuration.Redirection_File_delimter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                        if (rule.Length == 2)
+                        if (rule.Length == 2) //example1,example2
                             Configuration.RedirectionRules.Add(rule[0], rule[1]); // key is the old site name :: Value is new site name
                         else
                             all_lines_in_format = false;

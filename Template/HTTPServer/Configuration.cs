@@ -17,7 +17,7 @@ namespace HTTPServer
         public static string Delimter = "\r\n";
         public static string Header_delimter = ": ";
         public static string Redirection_File_delimter = ",";
-        public static char[] URI_delemiter = { '\\' };
+        public static char[] URI_delemiter = { '/' };
 
         // Server Typies
         public static string ServerType = "FCISServer";

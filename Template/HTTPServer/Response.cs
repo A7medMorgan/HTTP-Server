@@ -38,7 +38,7 @@ namespace HTTPServer
 
             if (code == StatusCode.Redirect) // add redirected path
             {
-                headerLines.Add("Location" + Configuration.Header_delimter + redirectoinPath);
+                headerLines.Add("Location" + Configuration.Header_delimter + Configuration.URI_delemiter + redirectoinPath);
             }
 
             // TODO: Create the request string
@@ -66,7 +66,7 @@ namespace HTTPServer
             switch (code)
             {
                 case StatusCode.OK:
-                    statusLine = StatusCode.OK.ToString() + " " + StatusCode.OK.ToString();
+                    statusLine = StatusCode.OK + " " + StatusCode.OK.ToString();
                     break;
                 case StatusCode.InternalServerError:
                     statusLine = StatusCode.InternalServerError + " " + StatusCode.InternalServerError.ToString();
@@ -87,7 +87,7 @@ namespace HTTPServer
 
             return statusLine;
         }
-        public Response CreateRespond(Request request , int server_id)
+        public Response CreateRespond(bool Request_ParseRequest,RequestMethod requestMethod ,string ReletiveURI, int server_id)
         {
             string Physical_path = string.Empty;
             string content;
@@ -95,7 +95,7 @@ namespace HTTPServer
             try
             {
                 //TODO: check for bad request 
-                if (!request.ParseRequest(server_id)) // parsing not successed
+                if (!Request_ParseRequest) // parsing not successed
                 {
                     statusCode = StatusCode.BadRequest;
                     Physical_path = Configuration.ReletivePath + Configuration.BadRequestDefaultPageName;
@@ -106,10 +106,10 @@ namespace HTTPServer
                     return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty);
                 }
 
-                switch (request.method)
+                switch (requestMethod)
                 {
                     case RequestMethod.GET:
-                        return Create_Get_Request(request, server_id);
+                        return Create_Get_Respond(ReletiveURI);
                     case RequestMethod.POST:
                         break;
                     case RequestMethod.HEAD:
@@ -134,29 +134,29 @@ namespace HTTPServer
             return null;
         }
 
-        private Response Create_Get_Request(Request request, int server_id)
+        private Response Create_Get_Respond(string relativeURI)
         {
             string content = string.Empty;
             string Redirection_path = string.Empty;
-            string Physical_path = string.Empty;
+            string Physical_path = null;
             StatusCode statusCode;
                  // request has all the info need by server
                 
                     //TODO: map the relativeURI in request to get the physical path of the resource.
-                    Physical_path = this.MAP_URI_ToPage_PhysicalPath(request.relativeURI);
+                    Physical_path = this.MAP_URI_ToPage_PhysicalPath(relativeURI);
 
             //TODO: check file exists
 
-            if (!Physical_path.Equals(string.Empty))
+            if (Physical_path != null)
             {
                 statusCode = StatusCode.OK;
             }
             else
             {
                 //TODO: check for redirect
-                Redirection_path = GetRedirectionPagePathIFExist(request.relativeURI);
+                Redirection_path = GetRedirectionPagePathIFExist(relativeURI);
 
-                if (Redirection_path.Equals(string.Empty)) // no redirection enteries
+                if (Redirection_path == null) // no redirection enteries
                 {
                     Physical_path = Configuration.ReletivePath + Configuration.NotFoundDefaultPageName;
                     statusCode = StatusCode.NotFound;
@@ -176,9 +176,9 @@ namespace HTTPServer
 
         private string MAP_URI_ToPage_PhysicalPath(string ReletiveURI)
         {
-            string filepath = string.Empty;
+            string filepath = null;
 
-            if (ReletiveURI.Equals(string.Empty)) return filepath;
+            if (ReletiveURI == null) return filepath;
 
             string[] splited = ReletiveURI.Split(Configuration.URI_delemiter, StringSplitOptions.RemoveEmptyEntries);
 
@@ -193,9 +193,13 @@ namespace HTTPServer
         public string GetRedirectionPagePathIFExist(string relativePath)
         {
             // using Configuration.RedirectionRules return the redirected page path if exists else returns empty
-            string redirectied_path = string.Empty;
+            string redirectied_path = null;
+            string[] splited = relativePath.Split(Configuration.URI_delemiter, StringSplitOptions.RemoveEmptyEntries);
+
+            string old_page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
+
             if (Configuration.RedirectionRules != null)
-                Configuration.RedirectionRules.TryGetValue(relativePath, out redirectied_path);
+                Configuration.RedirectionRules.TryGetValue(old_page_name, out redirectied_path);
 
             return redirectied_path;
         }

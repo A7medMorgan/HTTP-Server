@@ -38,7 +38,7 @@ namespace HTTPServer
 
             if (code == StatusCode.Redirect) // add redirected path
             {
-                headerLines.Add("Location" + Configuration.Header_delimter + Configuration.URI_delemiter + redirectoinPath);
+                headerLines.Add("Location" + Configuration.Header_delimter + redirectoinPath );
             }
 
             // TODO: Create the request string
@@ -53,37 +53,13 @@ namespace HTTPServer
 
             responseString += content; // Add content
         }
-        public Response()
-        {
-            
-        }
+        public Response() { }
 
         private string GetStatusLine(StatusCode code)
         {
             // TODO: Create the response status line and return it
             string statusLine = string.Empty;
-
-            switch (code)
-            {
-                case StatusCode.OK:
-                    statusLine = StatusCode.OK + " " + StatusCode.OK.ToString();
-                    break;
-                case StatusCode.InternalServerError:
-                    statusLine = StatusCode.InternalServerError + " " + StatusCode.InternalServerError.ToString();
-                    break;
-                case StatusCode.NotFound:
-                    statusLine = StatusCode.NotFound + " " + StatusCode.NotFound.ToString();
-                    break;
-                case StatusCode.BadRequest:
-                    statusLine = StatusCode.BadRequest + " " + StatusCode.BadRequest.ToString();
-                    break;
-                case StatusCode.Redirect:
-                    statusLine = StatusCode.Redirect + " " + StatusCode.Redirect.ToString();
-                    break;
-                default:
-                    statusLine = StatusCode.BadRequest + " " + StatusCode.BadRequest.ToString();
-                    break;
-            }
+            statusLine = (int)code + " " + code.ToString();
 
             return statusLine;
         }

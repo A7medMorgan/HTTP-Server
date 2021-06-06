@@ -7,12 +7,13 @@ using System.Net.Sockets;
 using System.Threading;
 using System.IO;
 
+
 namespace HTTPServer
 {
     class Server
     {
-        private Socket ServerSocket { get; set; }
-        public static List<Socket> List_Servers = new List<Socket>();
+        public static Socket ServerSocket { get;private set; }
+        //public static List<Socket> List_Servers = new List<Socket>();
         public int server_ID { get; private set; }
 
         private int port;
@@ -42,8 +43,10 @@ namespace HTTPServer
                 Console.WriteLine("Server Cannot be Init at the specified ip | port");
                 Environment.Exit(1);
             }
-            List_Servers.Add(ServerSocket);
-            server_ID = List_Servers.Count - 1;
+            //List_Servers.Add(ServerSocket);
+            //server_ID = List_Servers.Count - 1;
+            server_ID = new Random().Next();
+
             Console.WriteLine("Server ID : {0}  -> Binded successfly to Local EndPoint {1}" , server_ID , ServerSocket.LocalEndPoint);
         }
 
@@ -92,14 +95,16 @@ namespace HTTPServer
                     msg = Encoding.ASCII.GetString(data, 0, receivedLen);
                     if (receivedLen == 0)
                     {
-                        //Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
-                        //break;
-                        continue;
+                        Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
+                        break;
+                        //continue;
                     }
                     else
                         Console.WriteLine("Recieved request from :{0}", newConnection.RemoteEndPoint);
 
-                    Console.WriteLine("\tRecived \n{0} Byte", msg);
+                    Console.WriteLine("\tRecived \n{0} Byte", receivedLen);
+                    Console.WriteLine("\tRecived \n{0} ", msg); // to trace traffic
+
                     // TODO: Create a Request object using received request string                    
                     Request request = new Request(msg);
 
@@ -114,9 +119,9 @@ namespace HTTPServer
 
                     data = Encoding.ASCII.GetBytes(response.ResponseString);
                     newConnection.Send(data,SocketFlags.None);
-                    Console.WriteLine("Sent \n{0} Byte", data.Length);
 
-                    Console.WriteLine("Sent \n{0}", response.ResponseString);
+                    Console.WriteLine("Server Sent \n{0} Byte", data.Length);
+                    Console.WriteLine("\tSent \n{0}", response.ResponseString); // to trace traffic
 
                     msg = string.Empty; // clear the msg
                     if (!Multiple_Connection_Over_time) break; // end the connection
@@ -130,7 +135,7 @@ namespace HTTPServer
             }
 
             // TODO: close client socket
-           // Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
+            Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
             newConnection.Shutdown(SocketShutdown.Both);
             newConnection.Close();
         }
@@ -153,7 +158,7 @@ namespace HTTPServer
             {
                 // TODO: using the filepath paramter read the redirection rules from file 
                 string[] lines = File.ReadAllLines(filePath);
-                Console.WriteLine("Load Redirection File .... " + "\n" + "With {0} Enteries", lines.Length);
+                Console.WriteLine("Load Redirection File .... " + "\t" + "With {0} Enteries", lines.Length);
 
                 Configuration.RedirectionRules = new Dictionary<string, string>();
 
@@ -164,7 +169,8 @@ namespace HTTPServer
                     foreach (string line in lines)
                     {
                         string[] rule = line.Split(Configuration.Redirection_File_delimter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                        if (rule.Length == 2) //example1,example2
+                        if (rule.Length == 2) 
+                                                                                    //example1,example2
                             Configuration.RedirectionRules.Add(rule[0], rule[1]); // key is the old site name :: Value is new site name
                         else
                             all_lines_in_format = false;

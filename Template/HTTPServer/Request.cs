@@ -45,7 +45,7 @@ namespace HTTPServer
         {
             //TODO: parse the receivedRequest using the \r\n delimeter   
 
-            requestLines = requestString.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            requestLines = requestString.Split(new string[] { Configuration.Delimter }, StringSplitOptions.None);
 
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
 
@@ -69,17 +69,18 @@ namespace HTTPServer
             bool Host_found = headerLines.TryGetValue("Host", out Host); // host line
             if (Host_found)
             {
-                if (!Host.Equals(Server.List_Servers[server_ID].LocalEndPoint.ToString())) return false;
-                return true;
+                //if (Host.Equals(Server.List_Servers[server_ID].LocalEndPoint.ToString())) return true;
+                if (Server.ServerSocket.LocalEndPoint.ToString().Equals(Host)) return true;
             }
-            else return false;
+            
+            return false;
         }
 
         public bool Multiple_Connection_Over_time() // presestance Connection
         {
             if (headerLines.Count != 0)
             {
-                string conn;
+                string conn = "";
                 headerLines.TryGetValue("Connection", out conn);
                 if (conn.Equals("keep-alive"))
                     return true;
@@ -143,6 +144,7 @@ namespace HTTPServer
                 if (header.Length == 2)
                 {
                     headerLines.Add(header[0], header[1]); // key is attribute name  :: Value is attribute value 
+                    //content_type: text/html
                 }
             }
             if (headerLines.Count < min_lines) return false; 

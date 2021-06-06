@@ -1,8 +1,8 @@
-6/6/2021 9:00:01 AM
+6/6/2021 11:41:37 AM
 Source :HTTPServer
 One of the identified items was in an invalid format.
 Fun Caused EX :	Void LoadRedirectionRules(System.String)
 SourceClass :-> HTTPServer.Server
 
-Server Start With ID 1093865173 binded on EndPoint 127.0.0.1:1000 
-Date : 6/6/2021 9:00:01 AM
+Server Start With ID 1427827553 binded on EndPoint 127.0.0.1:1000 
+Date : 6/6/2021 11:41:37 AM

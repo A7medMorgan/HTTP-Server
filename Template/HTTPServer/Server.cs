@@ -83,27 +83,30 @@ namespace HTTPServer
             byte[] data;
             int receivedLen;
             string msg = "";
-            int no_empty_request = 0;
+            //int no_empty_request = 0;
             while (true)
             {
                 try
                 {
-                    if (no_empty_request == 3)
-                    {
-                        Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
-                    }
-                    data = new byte[1024 * 1024];
+                    //if (no_empty_request == 10000)
+                    //{
+                    //    Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
+                    //    break;
+                    //}
+
+                    data = new byte[2048];
                     // TODO: Receive request
                     receivedLen = newConnection.Receive(data);
                     // TODO: break the while loop if receivedLen==0
                     msg = Encoding.ASCII.GetString(data, 0, receivedLen);
-                    if (receivedLen == 0)
-                    {
-                        //break;
-                        no_empty_request++;
-                        continue;
-                    }
-                    else
+                    //if (receivedLen == 0)
+                    //{
+                    //    Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
+                    //    break;
+                    //    //no_empty_request++;
+                    //    //continue;
+                    //}
+                    //else
                         Console.WriteLine("Recieved request from :{0}", newConnection.RemoteEndPoint);
 
                     Console.WriteLine("Server Recived \t{0} Byte", receivedLen);
@@ -133,7 +136,7 @@ namespace HTTPServer
                         Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
                         break; // end the connection
                     }
-                    no_empty_request = 0;
+                    //no_empty_request = 0;
                 }
                 catch (Exception ex)
                 {

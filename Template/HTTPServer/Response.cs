@@ -51,6 +51,7 @@ namespace HTTPServer
             }
             responseString += Configuration.Delimter; // Add Blank Line
 
+            if(content != string.Empty)
             responseString += content; // Add content
         }
         public Response() { }
@@ -89,7 +90,7 @@ namespace HTTPServer
                     case RequestMethod.POST:
                         break;
                     case RequestMethod.HEAD:
-                        break;
+                        return Create_Head_Respond(ReletiveURI);
                     default:
                         break;
                 }
@@ -147,6 +148,42 @@ namespace HTTPServer
             content = this.LoadDefaultPage(Physical_path);
             // Create OK response
             return new Response(statusCode, Configuration.WebPagesTextType, content, Redirection_path);
+        }
+        private Response Create_Head_Respond(string relativeURI)
+        {
+            string content = string.Empty;
+            string Redirection_path = string.Empty;
+            string Physical_path = null;
+            StatusCode statusCode;
+            // request has all the info need by server
+
+            //TODO: map the relativeURI in request to get the physical path of the resource.
+            Physical_path = this.MAP_URI_ToPage_PhysicalPath(relativeURI);
+
+            //TODO: check file exists
+
+            if (Physical_path != null)
+            {
+                statusCode = StatusCode.OK;
+            }
+            else
+            {
+                //TODO: check for redirect
+                Redirection_path = GetRedirectionPagePathIFExist(relativeURI);
+
+                if (Redirection_path == null) // no redirection enteries
+                {
+                    Physical_path = Configuration.ReletivePath + Configuration.NotFoundDefaultPageName;
+                    statusCode = StatusCode.NotFound;
+                }
+                else
+                {
+                    Physical_path = Configuration.ReletivePath + Configuration.RedirectionDefaultPageName;
+                    statusCode = StatusCode.Redirect;
+                }
+            }
+            // Create OK response
+            return new Response(statusCode, Configuration.WebPagesTextType, string.Empty, Redirection_path);
         }
 
 

@@ -5,4 +5,4 @@ aboutus1,aboutus2
 aboutus3,aboutus2
 aboutus2,aboutus2
 main,main
-ahmed,morgan
+ahmed,aboutus2

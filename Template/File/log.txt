@@ -1,2 +1,2 @@
-Server Start With ID 1839178710 binded on EndPoint 192.168.137.1:1000 
-Date : 6/6/2021 3:45:06 AM
+Server Start With ID 365674044 binded on EndPoint 192.168.137.1:1000 
+Date : 6/6/2021 6:19:51 AM

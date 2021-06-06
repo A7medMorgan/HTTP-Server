@@ -14,8 +14,8 @@ namespace HTTPServer
             // for each exception write its details associated with datetime 
             
             string msg = Get_Date()+"\nSource :" + ex.Source + "\n" + ex.Message + "\n" +
-                "Fun Caused EX :\t"+ex.TargetSite +"\nSourceClass :-> " + source_class;
-            File.WriteAllText(Configuration.Log_file_path, msg + Configuration.Delimter);
+                "Fun Caused EX :\t"+ex.TargetSite +"\nSourceClass :-> " + source_class + "\n";
+            File.AppendAllText(Configuration.Log_file_path, msg + Configuration.Delimter);
         }
 
         public static string Get_Date()

@@ -150,6 +150,7 @@ namespace HTTPServer
         private Response Create_Head_Respond(string relativeURI)
         {
             string content = string.Empty;
+            string Redirection_path = string.Empty;
             string Physical_path = null;
             StatusCode statusCode;
             // request has all the info need by server
@@ -167,10 +168,22 @@ namespace HTTPServer
             }
             else
             {
-                statusCode = StatusCode.NotFound;
-                content = "";
+                //TODO: check for redirect
+                Redirection_path = GetRedirectionPagePathIFExist(relativeURI);
+
+                if (Redirection_path == null) // no redirection enteries
+                {
+                    statusCode = StatusCode.NotFound;
+                    content = "";
+                }
+                else
+                {
+                    Physical_path = Configuration.ReletivePath + Configuration.RedirectionDefaultPageName;
+                    statusCode = StatusCode.Redirect;
+                    //TODO: read the physical file
+                    content = this.LoadDefaultPage(Physical_path);
+                }
             }
-            
             // Create OK response
             return new Response(statusCode, Configuration.WebPagesTextType, string.Empty, string.Empty ,content.Length);
         }
@@ -184,11 +197,13 @@ namespace HTTPServer
 
             string[] splited = ReletiveURI.Split(Configuration.URI_delemiter, StringSplitOptions.RemoveEmptyEntries);
 
-            string page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
+            if (splited.Length != 0)
+            {
+                string page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
 
-            if (Configuration.Pages_path != null)
-                Configuration.Pages_path.TryGetValue(page_name, out filepath);
-
+                if (Configuration.Pages_path != null)
+                    Configuration.Pages_path.TryGetValue(page_name, out filepath);
+            }
             return filepath;
         }
 
@@ -197,9 +212,15 @@ namespace HTTPServer
             // using Configuration.RedirectionRules return the redirected page path if exists else returns empty
             string redirectied_path = null;
             string[] splited = relativePath.Split(Configuration.URI_delemiter, StringSplitOptions.RemoveEmptyEntries);
-
-            string old_page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
-
+            string old_page_name;
+            if (splited.Length != 0)
+            {
+               old_page_name = splited[splited.Length - 1]; // get the last name in URI which corespond to page name
+            }
+            else
+            {
+                old_page_name = new string(Configuration.URI_delemiter);
+            }
             if (Configuration.RedirectionRules != null)
                 Configuration.RedirectionRules.TryGetValue(old_page_name, out redirectied_path);
 

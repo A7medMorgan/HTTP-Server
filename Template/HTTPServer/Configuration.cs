@@ -31,7 +31,7 @@ namespace HTTPServer
         public static string Log_file_path = _RELATIVE_PATH + "log.txt";
 
         // Absolute & Relative Pathies for WEB PAGES
-        public static string RootPath = "C:\\inetpub\\wwwroot\\fcis1"; // of the OS
+        //public static string RootPath = "C:\\inetpub\\wwwroot\\fcis1"; // path of the OS
         public static string ReletivePath = "../../../../inetpub\\wwwroot\\fcis1\\"; // from the Debug File of the VS proj
 
         // Exceptional Pages

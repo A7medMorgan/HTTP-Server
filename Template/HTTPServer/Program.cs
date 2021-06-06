@@ -8,9 +8,9 @@ namespace HTTPServer
     {
         static void Main(string[] args)
         {
-            // TODO: Call CreateRedirectionRulesFile() function to create the rules of redirection
-                CreateRedirectionRulesFile();
             File.Delete(Configuration.Log_file_path); // clear the log file
+            // TODO: Call CreateRedirectionRulesFile() function to create the rules of redirection
+            CreateRedirectionRulesFile();
             //Start server
             // 1) Make server object on port 1000
             Console.WriteLine("Init Server ...");
@@ -31,7 +31,7 @@ namespace HTTPServer
 
             string Rules = string.Empty;
 
-            Console.WriteLine("Modify Rule in Redirection.txt File press (Y) to Cansel Press (N)");
+            Console.WriteLine("Modify Rule in Redirection.txt File press (Y) to Cansel Press (Any)");
             char c = Console.ReadLine()[0];
             if (c != 'y') return;
 

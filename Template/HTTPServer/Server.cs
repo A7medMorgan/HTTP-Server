@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -31,7 +30,7 @@ namespace HTTPServer
             EndPoint endpoint = null;
             try
             {
-                endpoint = new IPEndPoint(IPAddress.Parse("192.168.137.1"), portNumber);
+                endpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), portNumber);
             
             port = portNumber;
             ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -93,17 +92,17 @@ namespace HTTPServer
                     receivedLen = newConnection.Receive(data);
                     // TODO: break the while loop if receivedLen==0
                     msg = Encoding.ASCII.GetString(data, 0, receivedLen);
-                    if (receivedLen == 0)
-                    {
-                        Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
-                        break;
-                        //continue;
-                    }
-                    else
+                    //if (receivedLen == 0)
+                    //{
+                    //    Console.WriteLine("Client: {0}ended the connection", newConnection.RemoteEndPoint);
+                    //    break;
+                    //    //continue;
+                    //}
+                    //else
                         Console.WriteLine("Recieved request from :{0}", newConnection.RemoteEndPoint);
 
-                    Console.WriteLine("\tRecived \n{0} Byte", receivedLen);
-                    Console.WriteLine("\tRecived \n{0} ", msg); // to trace traffic
+                    Console.WriteLine("Server Recived \t{0} Byte", receivedLen);
+                    Console.WriteLine("\t **** Recived Data *****\n{0} ", msg); // to trace traffic
 
                     // TODO: Create a Request object using received request string                    
                     Request request = new Request(msg);
@@ -120,22 +119,26 @@ namespace HTTPServer
                     data = Encoding.ASCII.GetBytes(response.ResponseString);
                     newConnection.Send(data,SocketFlags.None);
 
-                    Console.WriteLine("Server Sent \n{0} Byte", data.Length);
-                    Console.WriteLine("\tSent \n{0}", response.ResponseString); // to trace traffic
+                    Console.WriteLine("Server Sent \t{0} Byte", data.Length);
+                    Console.WriteLine("\tSent *****Data***** \n{0}", response.ResponseString); // to trace traffic
 
                     msg = string.Empty; // clear the msg
-                    if (!Multiple_Connection_Over_time) break; // end the connection
+                    if (!Multiple_Connection_Over_time)
+                    {
+                        Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
+                        break; // end the connection
+                    }
                 }
                 catch (Exception ex)
                 {
                     // TODO: log exception using Logger class
                     Logger.LogException(ex , this.GetType().ToString());
+                    Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
                     break;
                 }
             }
 
             // TODO: close client socket
-            Console.WriteLine("Connection: {0} Ended by Server", newConnection.RemoteEndPoint);
             newConnection.Shutdown(SocketShutdown.Both);
             newConnection.Close();
         }

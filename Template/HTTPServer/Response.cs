@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 
 namespace HTTPServer
@@ -28,13 +26,13 @@ namespace HTTPServer
         }
         StatusCode code;
         List<string> headerLines = new List<string>();
-        public Response(StatusCode code, string contentType, string content, string redirectoinPath)
+        public Response(StatusCode code, string contentType, string content, string redirectoinPath , int contentLength)
         {
             // TODO: Add headlines (Content-Type, Content-Length,Date, [location if there is redirection])
 
             headerLines.Add("Content-Type" + Configuration.Header_delimter + contentType);
             headerLines.Add("Date" + Configuration.Header_delimter + Logger.Get_Date());
-            headerLines.Add("Content-Length" + Configuration.Header_delimter + content.Length.ToString());
+            headerLines.Add("Content-Length" + Configuration.Header_delimter + contentLength.ToString());
 
             if (code == StatusCode.Redirect) // add redirected path
             {
@@ -80,7 +78,7 @@ namespace HTTPServer
                     //TODO: read the physical file
                     content = this.LoadDefaultPage(Physical_path);
                     // Create OK response
-                    return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty);
+                    return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty , content.Length);
                 }
 
                 switch (requestMethod)
@@ -106,7 +104,7 @@ namespace HTTPServer
                 //TODO: read the physical file
                 content = this.LoadDefaultPage(Physical_path);
                 // Create OK response
-                return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty);
+                return new Response(statusCode, Configuration.WebPagesTextType, content, string.Empty , content.Length);
             }
             return null;
         }
@@ -147,12 +145,11 @@ namespace HTTPServer
             //TODO: read the physical file
             content = this.LoadDefaultPage(Physical_path);
             // Create OK response
-            return new Response(statusCode, Configuration.WebPagesTextType, content, Redirection_path);
+            return new Response(statusCode, Configuration.WebPagesTextType, content, Redirection_path , content.Length);
         }
         private Response Create_Head_Respond(string relativeURI)
         {
             string content = string.Empty;
-            string Redirection_path = string.Empty;
             string Physical_path = null;
             StatusCode statusCode;
             // request has all the info need by server
@@ -165,25 +162,17 @@ namespace HTTPServer
             if (Physical_path != null)
             {
                 statusCode = StatusCode.OK;
+                //TODO: read the physical file
+                content = this.LoadDefaultPage(Physical_path);
             }
             else
             {
-                //TODO: check for redirect
-                Redirection_path = GetRedirectionPagePathIFExist(relativeURI);
-
-                if (Redirection_path == null) // no redirection enteries
-                {
-                    Physical_path = Configuration.ReletivePath + Configuration.NotFoundDefaultPageName;
-                    statusCode = StatusCode.NotFound;
-                }
-                else
-                {
-                    Physical_path = Configuration.ReletivePath + Configuration.RedirectionDefaultPageName;
-                    statusCode = StatusCode.Redirect;
-                }
+                statusCode = StatusCode.NotFound;
+                content = "";
             }
+            
             // Create OK response
-            return new Response(statusCode, Configuration.WebPagesTextType, string.Empty, Redirection_path);
+            return new Response(statusCode, Configuration.WebPagesTextType, string.Empty, string.Empty ,content.Length);
         }
 
 

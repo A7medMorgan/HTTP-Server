@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace HTTPServer
@@ -29,7 +26,7 @@ namespace HTTPServer
         public static Dictionary<string, string> Pages_path;
 
         // Absolute & Relative Pathies for Server File
-        private static string _RELATIVE_PATH = "../../../File\\";
+        private static string _RELATIVE_PATH = "../../../../File\\";
         public static string Redirection_file_path = _RELATIVE_PATH + "redirectionRules.txt";
         public static string Log_file_path = _RELATIVE_PATH + "log.txt";
 
